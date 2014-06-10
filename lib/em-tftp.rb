@@ -298,12 +298,12 @@ module EventMachine
       EM.open_datagram_socket(server, port, klass)
     end
 
-    def tftp_get(server, port, filename, &callback)
+    def tftp_get(server, port=69, filename, &callback)
       conn = EM.open_datagram_socket('0.0.0.0', 0, TFTP::ClientConnection)
       conn.get_file(server, port, filename, &callback)
     end
 
-    def tftp_put(server, port, filename, file_data, &callback)
+    def tftp_put(server, port=69, filename, file_data, &callback)
       conn = EM.open_datagram_socket('0.0.0.0', 0, TFTP::ClientConnection)
       conn.put_file(server, port, filename, file_data, &callback)
     end
