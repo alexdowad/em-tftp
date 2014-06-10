@@ -2,6 +2,9 @@
 # EventMachine-based TFTP implementation
 #
 # References: RFC1350 (defines TFTP protocol)
+#
+# Caveats: em-tftp's ReadOnlyFileServer reads an entire file into memory before sending it
+#   This will not work well for huge files. But then again, TFTP is not designed for transferring huge files
 
 # TODO:
 # - documentation
@@ -36,6 +39,9 @@ module TFTP
       closed!
     end
 
+    # Send a file back to the client (in response to a 'get' request)
+    # Note that the file data does not necessarily have to originate from the filesystem;
+    #   it could be cached in memory or generated dynamically
     def send_file(file_data)
       @buffer = file_data
       @block_no = 1
