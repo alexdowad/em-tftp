@@ -12,6 +12,8 @@ require 'socket'
 
 module TFTP
   class Connection < EM::Connection
+    BASE_RETRANSMIT_TIMEOUT = 1.5 # seconds
+    MAX_RETRANSMIT_TIMEOUT = 12
 
     # COMMANDS:
 
@@ -31,8 +33,7 @@ module TFTP
       # this should be called if the disk is full, permissions do not allow the file to be read/saved, etc.
       send_error(code, error_msg || "Unknown error")
       close_connection
-      @closed = true
-      @direction = @buffer = @block_no = nil
+      closed!
     end
 
     def send_file(file_data)
@@ -66,6 +67,8 @@ module TFTP
     def post_init
       @buffer = @direction = @block_no = nil
       @closed = false
+      @timeout = 1.5
+      @timer = nil
     end
 
     def receive_data(data)
@@ -100,6 +103,7 @@ module TFTP
     def data(packet)
       raise "Received unexpected TFTP DATA packet while sending file" if @direction != :receive
       if packet.block_no == @block_no
+        stop_timer!
         if packet.data.size > 0
           received_block(packet.data)
         end
@@ -113,6 +117,7 @@ module TFTP
     end
     def ack(packet)
       raise "Received unexpected TFTP ACK packet while receiving file" if @direction != :send
+      stop_timer!
       if packet.block_no == @block_no
         @block_no += 1
         if @buffer.size <= 512
@@ -127,20 +132,40 @@ module TFTP
     def send_block
       block = @buffer.slice!(0, 512)
       data = "\0\3" << ((@block_no >> 8) & 255) << (@block_no & 255) << block
-      send_datagram(data, @peer_addr, @peer_port)
+      send_packet(data)
     end
     def send_ack
       data = "\0\4" << ((@block_no >> 8) & 255) << (@block_no & 255)
-      send_datagram(data, @peer_addr, @peer_port)
+      send_packet(data)
     end
     def send_error(code, msg)
       data = "\0\5" << ((code >> 8) & 255) << (code & 255) << msg << "\0"
+      send_packet(data, false)
+    end
+    def send_packet(data, set_timer=true)
       send_datagram(data, @peer_addr, @peer_port)
+      set_timer!(data) if set_timer
+    end
 
     def closed!
       @closed = true
       @direction = @buffer = @block_no = nil
       stop_timer!
+    end
+    def set_timer!(data)
+      @timer = EM::Timer.new(@timeout) do
+        @timeout *= 2
+        if @timeout <= MAX_RETRANSMIT_TIMEOUT
+          send_packet(data)
+        end
+      end
+    end
+    def stop_timer!
+      if @timer
+        @timer.cancel
+        @timer = nil
+        @timeout = BASE_RETRANSMIT_TIMEOUT
+      end
     end
   end
 
