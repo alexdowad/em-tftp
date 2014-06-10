@@ -1,32 +1,17 @@
 # encoding: ASCII-8BIT
 # EventMachine-based TFTP implementation
+#
+# References: RFC1350 (defines TFTP protocol)
+
+# TODO:
+# - documentation
+# - RDoc
 
 require 'eventmachine'
 require 'socket'
 
 module TFTP
   class Connection < EM::Connection
-    def post_init
-      @buffer = @direction = @block_no = nil
-      @closed = false
-    end
-
-    def receive_data(data)
-      @peer_port, @peer_addr = Socket.unpack_sockaddr_in(get_peername)
-      packet = Packet.new(data.encode!(Encoding::BINARY))
-      send(packet.opcode, packet)
-    rescue TFTP::Error
-      close_connection
-      @closed = true
-      failed($!.message)
-    end
-
-    def unbind
-      unless @closed
-        failed("Connection closed")
-        @closed = true
-      end
-    end
 
     # COMMANDS:
 
@@ -73,6 +58,31 @@ module TFTP
     end
 
     def completed
+    end
+
+    # DEFAULT CALLBACKS INVOKED BY EventMachine
+    # Not intended to be overridden in subclasses
+
+    def post_init
+      @buffer = @direction = @block_no = nil
+      @closed = false
+    end
+
+    def receive_data(data)
+      @peer_port, @peer_addr = Socket.unpack_sockaddr_in(get_peername)
+      packet = Packet.new(data.encode!(Encoding::BINARY))
+      send(packet.opcode, packet)
+    rescue TFTP::Error
+      close_connection
+      closed!
+      failed($!.message)
+    end
+
+    def unbind
+      unless @closed
+        closed!
+        failed("Connection closed")
+      end
     end
 
     private
@@ -126,6 +136,11 @@ module TFTP
     def send_error(code, msg)
       data = "\0\5" << ((code >> 8) & 255) << (code & 255) << msg << "\0"
       send_datagram(data, @peer_addr, @peer_port)
+
+    def closed!
+      @closed = true
+      @direction = @buffer = @block_no = nil
+      stop_timer!
     end
   end
 
