@@ -224,7 +224,7 @@ module TFTP
       path = File.join(base_dir, filename)
       begin
         if File.exist?(path)
-          send_file(File.read(path)) # should use non-blocking read!!!
+          EventMachine.defer(proc { File.binread(path) }, method(:send_file))
         else
           abort("File not found", 1)
         end
