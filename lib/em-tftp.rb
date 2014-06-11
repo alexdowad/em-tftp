@@ -325,7 +325,8 @@ module TFTP
       send_error(addr, port, 5, "Unknown transfer ID")
     end
     def ack(addr, port, packet)
-      send_error(addr, port, 5, "Unknown transfer ID")
+      # It's not a good idea to send an error back for unexpected ACK;
+      # some TFTP clients may send an "eager" ACK to try to make file come faster
     end
   end
 
