@@ -302,7 +302,7 @@ module TFTP
     def rrq(addr, port, packet)
       listener.get(addr, port, packet.filename) do |aye_nay, str_data|
         if aye_nay
-          connection = EM.open_datagram_socket('0.0.0.0', rand(10000)+1025, TFTP::TransferConnection)
+          connection = EM.open_datagram_socket('0.0.0.0', 0, TFTP::TransferConnection)
           connection.transfer = ServerSend.new(connection, addr, port, listener.new, str_data)
         else
           send_error(addr, port, 0, str_data || "Denied")
@@ -313,7 +313,7 @@ module TFTP
     def wrq(addr, port, packet)
       listener.put(addr, port, packet.filename) do |aye_nay, str_data|
         if aye_nay
-          connection = EM.open_datagram_socket('0.0.0.0', rand(10000)+1025, TFTP::TransferConnection)
+          connection = EM.open_datagram_socket('0.0.0.0', 0, TFTP::TransferConnection)
           connection.transfer = ServerReceive.new(connection, addr, port, listener.new)
         else
           send_error(addr, port, 0, "Denied")
