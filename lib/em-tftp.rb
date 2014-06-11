@@ -76,7 +76,7 @@ module TFTP
       send_packet(addr, port, data)
     end
     def send_block(addr=@peer_addr, port=@peer_port, buffer, pos, block_no)
-      block = buffer.slice(pos, 512)
+      block = buffer.slice(pos, 512) || ""
       data = "\0\3" << ((block_no >> 8) & 255) << (block_no & 255) << block
       send_packet(data)
       pos + 512
