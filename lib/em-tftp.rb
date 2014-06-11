@@ -207,7 +207,7 @@ module TFTP
       end
     end
     def ack(packet, port)
-      abort!(4, "Received unexpected TFTP ACK packed while receiving file")
+      abort!(4, "Received unexpected TFTP ACK packet while receiving file")
     end
   end
 
