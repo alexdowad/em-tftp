@@ -279,6 +279,11 @@ module TFTP
     Class.new(TFTP::ListeningConnection).tap { |c| c.instance_variable_set(:@listener_klass, listener_klass) }
   end
 
+  # UDP socket (really EM::Connection) on TFTP server which waits for incoming RRQ/WRQ
+  # When an incoming transfer request arrives, calls get/put on its listener
+  #   and starts the transfer if get passes true,<file data> (or put passes true) to the block
+  # If the data must be read from hard disk, EM.defer { File.read(...) } is recommended,
+  #   so as not to block the EM reactor from handling events
   class ListeningConnection < EM::Connection
     include Protocol
 
@@ -330,6 +335,7 @@ module TFTP
     end
   end
 
+  # UDP socket (really EM::Connection) which is being used for an in-progress transfer
   class TransferConnection < EM::Connection
     include Protocol
 
@@ -344,6 +350,8 @@ module TFTP
       end
     end
   end
+
+  # Listeners
 
   class ClientUploader
     def initialize(&block)
