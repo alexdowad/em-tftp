@@ -28,6 +28,11 @@ class MyTFTPServer
     yield false
   end
 
+  def self.error(error_msg)
+    # this one is optional -- it will be called if an error occurs when establishing
+    #   a new file transfer operation
+  end
+
   def received_block(str)
     # when a file write request is accepted, an instance of this class will be created
     #   and this method will be called for EACH block of data which is received
