@@ -8,7 +8,7 @@ To run a TFTP server, first you need to define an event handler class which will
 
 Code says it clearer than prose:
 
-```
+```ruby
 class MyTFTPServer
   def self.get(client_addr, client_port, filename)
     # if you want to accept a file read request and send back a file:
@@ -48,7 +48,7 @@ end
 
 With your event handler class defined, you just need:
 
-```
+```ruby
 # the default UDP port for TFTP servers is 69
 EM.run { EM.start_tftp_server('0.0.0.0', 69, MyTFTPServer) }
 ```
@@ -57,7 +57,7 @@ EM.run { EM.start_tftp_server('0.0.0.0', 69, MyTFTPServer) }
 
 Even simpler:
 
-```
+```ruby
 EM.run do
   EM.tftp_get(server_ip, 69, 'some-file-name.txt') do |success, content|
     if success
