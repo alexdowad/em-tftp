@@ -139,6 +139,12 @@ module TFTP
       @listener.failed(error_msg || "Unknown error")
     end
 
+    def error!(error_msg)
+      stop_timer!
+      @connection.close_connection
+      @listener.failed(error_msg)
+    end
+
     private
 
     def stop_timer!
@@ -348,6 +354,8 @@ module TFTP
       if transfer && peer_addr == transfer.peer_addr && (peer_port == transfer.peer_port || transfer.peer_port.nil?)
         transfer.send(packet.opcode, packet, peer_port)
       end
+    rescue TFTP::Error
+      transfer.error!($!.message)
     end
   end
 
