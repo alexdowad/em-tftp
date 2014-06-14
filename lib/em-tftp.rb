@@ -358,10 +358,10 @@ module TFTP
       @callback = block
     end
     def completed
-      @callback.call(:success)
+      @callback.call(true, nil)
     end
     def failed(error_msg)
-      @callback.call(:failed, error_msg)
+      @callback.call(false, error_msg)
     end
   end
 
@@ -374,10 +374,10 @@ module TFTP
       @buffer << block
     end
     def completed
-      @callback.call(:success, @buffer)
+      @callback.call(true, @buffer)
     end
     def failed(error_msg)
-      @callback.call(:failed, error_msg)
+      @callback.call(false, error_msg)
     end
   end
 
