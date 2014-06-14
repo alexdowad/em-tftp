@@ -91,7 +91,6 @@ module TFTP
     end
     def send_packet(addr=@peer_addr, port=@peer_port, data)
       # this appears useless, but is intended to be overridden
-      $stderr.puts "Sending: #{data} (#{data[0..3].bytes.to_a.join(',')}) to #{addr}:#{port}"  if $DEBUG
       send_datagram(data, addr, port)
     end
   end
@@ -172,7 +171,6 @@ module TFTP
     end
 
     def send_packet(addr=@peer_addr, port=@peer_port, packet_data)
-      $stderr.puts "Sending: #{packet_data} (#{packet_data[0..3].bytes.to_a.join(',')}) to #{addr}:#{port}" if $DEBUG
       @connection.send_datagram(packet_data, addr, port)
       set_timer!(packet_data) unless packet_data.start_with? "\0\5" # no timeout and retransmit for error packets
     end
@@ -299,7 +297,6 @@ module TFTP
 
     def receive_data(data)
       peer_port, peer_addr = Socket.unpack_sockaddr_in(get_peername)
-      $stderr.puts "Received: #{data} (#{data[0..3].bytes.to_a.join(',')}) from #{peer_addr}:#{peer_port}" if $DEBUG
       packet = Packet.new(data.encode!(Encoding::BINARY))
       send(packet.opcode, peer_addr, peer_port, packet)
     rescue TFTP::Error
@@ -349,7 +346,6 @@ module TFTP
 
     def receive_data(data)
       peer_port, peer_addr = Socket.unpack_sockaddr_in(get_peername)
-      $stderr.puts "Received: #{data} (#{data[0..3].bytes.to_a.join(',')}) from #{peer_addr}:#{peer_port}" if $DEBUG
       packet = Packet.new(data.encode!(Encoding::BINARY))
       if transfer && peer_addr == transfer.peer_addr && (peer_port == transfer.peer_port || transfer.peer_port.nil?)
         transfer.send(packet.opcode, packet, peer_port)
