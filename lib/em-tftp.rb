@@ -31,7 +31,7 @@ module TFTP
 
     # Used to decode incoming packets
     # TFTP packets have a simple structure: the port number from the encapsulating UDP datagram doubles as a 'transfer ID',
-    #   allowing multiple, simultaneous transfers betweent the same hosts
+    #   allowing multiple, simultaneous transfers between the same hosts
     # The first 2 bytes of the payload are an integral 'opcode' from 1-5, in network byte order
     # The opcodes are: Read ReQuest, Write ReQuest, DATA, ACK, and ERROR
     # Depending on the opcode, different fields can follow. All fields are either 16-bit integers in network byte order,
