@@ -1,7 +1,10 @@
 # encoding: ASCII-8BIT
 # EventMachine-based TFTP implementation
 #
-# References: RFC1350 (defines TFTP protocol)
+# References:
+# - RFC 1350 (defines TFTP protocol)
+# - RFC 2347 (negotiation of TFTP options)
+# - RFC 2348 (TFTP block size option)
 #
 # Caveats: em-tftp's ReadOnlyFileServer reads an entire file into memory before sending it
 #   This will not work well for huge files. But then again, TFTP is not designed for transferring huge files
