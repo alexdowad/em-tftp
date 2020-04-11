@@ -1,8 +1,10 @@
-#EM-TFTP
+EM-TFTP
+=======
 
 EM-TFTP is a Ruby EventMachine-based implementation of the TFTP protocol (both client and server sides).
 
-##TFTP Server API
+TFTP Server API
+---------------
 
 To run a TFTP server, first you need to define an event handler class which will be used to customize how EM-TFTP handles client requests. One instance of the class will be created for each file transfer operation (so you can store values related to each individual operation in instance variables).
 
@@ -58,7 +60,8 @@ With your event handler class defined, you just need:
 EM.run { EM.start_tftp_server('0.0.0.0', 69, MyTFTPServer) }
 ```
 
-##TFTP Client API
+TFTP Client API
+---------------
 
 Even simpler:
 
@@ -78,6 +81,7 @@ EM.run do
 end
 ```
 
-##Warnings:
+Warnings:
+---------
 
 - In most cases, EM-TFTP requires you to buffer entire files in memory when sending/receiving. This will not work well for huge files. On the other hand, TFTP is not designed for transferring huge files.
