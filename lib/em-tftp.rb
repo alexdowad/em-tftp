@@ -10,9 +10,11 @@
 #   This will not work well for huge files. But then again, TFTP is not designed for transferring huge files
 
 # TODO:
-# - documentation
+# - ri
 # - RDoc
-# - test against ~3 other implementations
+# - tests
+# - listen on all interfaces by default?
+# - block size option
 
 require 'eventmachine'
 require 'socket'

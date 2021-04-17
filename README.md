@@ -21,6 +21,8 @@ class MyTFTPServer
 
     # if you want to reject a file read request:
     yield false, "error message here"
+
+    # or if you don't yield, the server will quietly ignore the request
   end
 
   def self.put(client_addr, client_port, filename)
